@@ -106,6 +106,16 @@ irm https://raw.githubusercontent.com/palemoky/dnspick/main/install.ps1 | iex
 
 为了方便使用，建议将解压后的可执行文件移动到您系统的 `PATH` 环境变量所包含的目录中（例如 `/usr/local/bin` 或 `C:\Windows\System32`）。
 
+### 更新
+
+随时原地升级到最新版本：
+
+```bash
+dnspick update
+```
+
+dnspick 在运行时还会在后台检查是否有新版本。在交互式终端中若发现新版本会打印提示并自动原地更新；输出被管道接管或在 CI 中则只打印一行升级提示（脚本化运行不会被自动修改）。该检查不阻塞主流程，仅在正式发布版本中触发，离线时静默跳过。
+
 ### macOS 提示「已损坏 / 移动到垃圾桶」
 
 由于本工具未经过 Apple 付费的公证（notarization），macOS 的 Gatekeeper 会拦截从网络下载的程序，弹出「无法验证开发者」「已损坏，应移到废纸篓」等提示。这是正常现象，**并非文件损坏**。任选一种方式解除即可：
@@ -214,7 +224,7 @@ dnspick --json | jq '.recommendation.top'
 | `recommendation.top[]` | 成功率超过 98% 的服务器，最多 3 个，按排名排序。无符合者时为空。 |
 | `recommendation.system_dns.verdict` | 稳定枚举：`best`（已最优）、`good_enough`（无需更换）、`switch`（存在明显更优的服务器）、`all_failed`（全部查询失败）。 |
 | `recommendation.system_dns.is_internal_dns` | 系统 DNS 为内网（RFC 1918/4193）或回环解析器时为 `true`；此时切换到外部 DNS 可能导致内部域名无法解析。 |
-| `protocol` | 服务器的传输协议：`udp`、`dot`（DNS-over-TLS）、`doh`（DNS-over-HTTPS）或 `doh3`（DNS-over-HTTP/3）。文本报告中 DoT 地址显示为 `tls://host`，DoH3 显示为 `h3://host`。 |
+| `protocol` | 服务器的传输协议：`udp`、`dot`（DNS-over-TLS）、`doh`（DNS-over-HTTPS）或 `doh3`（DNS-over-HTTP/3）。文本报告中 DoT 地址显示为 `tls://host`；DoH3 保留真实的 `https://` 地址（HTTP/3 在底层协商），靠"DNS 服务器"列的 `(DoH3)` 区分。 |
 | `recommendation.system_dns.should_switch` | 便捷布尔值：当 `verdict` 为 `switch` 或 `all_failed` 时为 `true`。 |
 
 ---

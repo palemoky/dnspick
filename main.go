@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+	"golang.org/x/mod/semver"
+	"golang.org/x/term"
 
 	"github.com/palemoky/dnspick/internal/buildinfo"
 	"github.com/palemoky/dnspick/internal/dnsbench"
@@ -134,6 +136,10 @@ func runBenchmark(cmd *cobra.Command, args []string) error {
 		return ui.WriteJSON(os.Stdout, results, queriesPerDomain, len(domains))
 	}
 
+	// Kick off a non-blocking check for a newer release; it runs concurrently
+	// with the benchmark and the notice (if any) is printed at the end.
+	updateCh := startUpdateCheck()
+
 	fmt.Printf(m.BenchStarting, len(servers), len(domains))
 
 	tracker := ui.NewStatusTracker(domains, len(servers), queriesPerDomain)
@@ -146,7 +152,76 @@ func runBenchmark(cmd *cobra.Command, args []string) error {
 
 	fmt.Println(m.RecommendHeader)
 	ui.PrintRecommendations(results)
+
+	autoUpdate(updateCh)
 	return nil
+}
+
+// updateCheckTimeout bounds the background "is there a newer release?" check so a
+// slow or unreachable network never holds anything up for long.
+const updateCheckTimeout = 3 * time.Second
+
+// updateNoticeGrace is how long the final notice waits for a still-pending check
+// before giving up, so an unusually fast benchmark doesn't block on the network.
+const updateNoticeGrace = 1500 * time.Millisecond
+
+// startUpdateCheck launches a non-blocking check for a newer release and returns
+// a channel that yields the result (or nil on any error). It is skipped for
+// non-release builds (e.g. "dev"), which are never valid semver, so local builds
+// are not nagged on every run.
+func startUpdateCheck() <-chan *updater.CheckResult {
+	ch := make(chan *updater.CheckResult, 1)
+	if !semver.IsValid(buildinfo.Version) {
+		ch <- nil
+		return ch
+	}
+	go func() {
+		ctx, cancel := context.WithTimeout(context.Background(), updateCheckTimeout)
+		defer cancel()
+		res, err := updater.Check(ctx, buildinfo.Version)
+		if err != nil {
+			ch <- nil
+			return
+		}
+		ch <- res
+	}()
+	return ch
+}
+
+// autoUpdate acts on the background update check. When a newer release is found
+// it prints a notice and updates in place automatically. In a non-interactive
+// context (piped/CI) it does not self-modify, printing a passive hint instead so
+// scripted runs stay reproducible. It waits at most updateNoticeGrace for a
+// still-pending check; a pending or failed check does nothing.
+func autoUpdate(ch <-chan *updater.CheckResult) {
+	var res *updater.CheckResult
+	select {
+	case res = <-ch:
+	case <-time.After(updateNoticeGrace):
+		return // check still running; don't block this run
+	}
+	if res == nil || !res.HasUpdate {
+		return
+	}
+
+	m := i18n.L()
+	// Non-interactive (piped/CI): just hint, never self-modify unprompted.
+	if !term.IsTerminal(int(os.Stdout.Fd())) {
+		fmt.Printf(m.UpdateAvailable, res.Current, res.Latest, res.URL)
+		return
+	}
+
+	fmt.Printf(m.UpdateAutoNotice, res.Current, res.Latest)
+	ctx, cancel := context.WithTimeout(context.Background(), updater.DefaultTimeout)
+	defer cancel()
+	latest, updated, err := updater.Update(ctx, res.Current)
+	if err != nil {
+		fmt.Printf("%s %v\n", m.UpdateFailed, err)
+		return
+	}
+	if updated {
+		fmt.Printf(m.UpdateDone, latest)
+	}
 }
 
 func main() {

@@ -106,6 +106,16 @@ You can also download a prebuilt binary for your OS directly from the [GitHub Re
 
 For convenience, move the extracted executable into a directory on your system `PATH` (e.g. `/usr/local/bin` or `C:\Windows\System32`).
 
+### Updating
+
+Update in place to the latest release at any time:
+
+```bash
+dnspick update
+```
+
+dnspick also checks for a newer release in the background while it runs. On an interactive terminal it prints a notice and updates itself in place automatically when one is found; when the output is piped or in CI it just prints a one-line hint instead (so scripted runs are never self-modified). The check is non-blocking, only happens on release builds, and is silently skipped when offline.
+
 ### macOS says "damaged / move to Trash"
 
 Because this tool is not notarized through Apple's paid program, macOS Gatekeeper blocks programs downloaded from the internet and shows messages like "cannot verify the developer" or "damaged and should be moved to the Trash". This is expected and the **file is not actually damaged**. Use any one of the following:
@@ -214,7 +224,7 @@ Pass `--json` to get a single JSON document on **stdout**, suitable for scripts,
 | `recommendation.top[]` | Up to 3 servers with a success rate above 98%, in ranked order. Empty when none qualify. |
 | `recommendation.system_dns.verdict` | Stable enum: `best` (already optimal), `good_enough` (keep it), `switch` (a clearly better server exists), `all_failed` (every query failed). |
 | `recommendation.system_dns.is_internal_dns` | `true` when the system DNS is a private (RFC 1918/4193) or loopback resolver; switching to an external DNS may break internal hostname resolution. |
-| `protocol` | Transport for the server: `udp`, `dot` (DNS-over-TLS), `doh` (DNS-over-HTTPS) or `doh3` (DNS-over-HTTP/3). DoT addresses are shown as `tls://host` and DoH3 as `h3://host` in the text report. |
+| `protocol` | Transport for the server: `udp`, `dot` (DNS-over-TLS), `doh` (DNS-over-HTTPS) or `doh3` (DNS-over-HTTP/3). DoT addresses are shown as `tls://host` in the text report; DoH3 keeps its real `https://` endpoint (HTTP/3 is negotiated underneath) and is identified by the `(DoH3)` server name. |
 | `recommendation.system_dns.should_switch` | Convenience boolean: `true` when `verdict` is `switch` or `all_failed`. |
 
 ---

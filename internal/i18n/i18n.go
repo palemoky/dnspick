@@ -37,10 +37,12 @@ type Messages struct {
 	FlagJSON        string
 
 	// update command.
-	UpdateChecking string // "Current version: %s, checking for updates...\n"
-	UpdateFailed   string // printed before the error detail
-	UpdateUpToDate string // "Already on the latest version (%s).\n"
-	UpdateDone     string // "✓ Updated to %s.\n"
+	UpdateAvailable  string // non-interactive startup hint: (current, latest, releaseURL)
+	UpdateAutoNotice string // interactive startup notice before auto-updating: (current, latest)
+	UpdateChecking   string // "Current version: %s, checking for updates...\n"
+	UpdateFailed     string // printed before the error detail
+	UpdateUpToDate   string // "Already on the latest version (%s).\n"
+	UpdateDone       string // "✓ Updated to %s.\n"
 
 	// benchmark run.
 	ErrNoDomains    string
@@ -90,10 +92,12 @@ var en = &Messages{
 	FlagLang:        "UI language: en or zh (defaults to $LANG)",
 	FlagJSON:        "Output machine-readable JSON to stdout (suppresses the progress UI)",
 
-	UpdateChecking: "Current version: %s, checking for updates...\n",
-	UpdateFailed:   "update failed:",
-	UpdateUpToDate: "Already on the latest version (%s).\n",
-	UpdateDone:     "✓ Updated to %s.\n",
+	UpdateAvailable:  "\n📦 A new version is available: %s → %s\n   Run 'dnspick update' to upgrade. Release notes: %s\n",
+	UpdateAutoNotice: "\n📦 A new version is available: %s → %s, updating automatically...\n",
+	UpdateChecking:   "Current version: %s, checking for updates...\n",
+	UpdateFailed:     "update failed:",
+	UpdateUpToDate:   "Already on the latest version (%s).\n",
+	UpdateDone:       "✓ Updated to %s.\n",
 
 	ErrNoDomains:    "error: no valid domains to test.",
 	ErrNoServers:    "error: no valid servers to test.",
@@ -138,10 +142,12 @@ var zh = &Messages{
 	FlagLang:        "界面语言：en 或 zh（默认跟随 $LANG）",
 	FlagJSON:        "以机器可读的 JSON 输出到 stdout（不显示进度界面）",
 
-	UpdateChecking: "当前版本: %s，正在检查更新...\n",
-	UpdateFailed:   "更新失败:",
-	UpdateUpToDate: "已是最新版本 (%s)。\n",
-	UpdateDone:     "✓ 已更新到 %s。\n",
+	UpdateAvailable:  "\n📦 发现新版本：%s → %s\n   运行 'dnspick update' 升级。版本说明：%s\n",
+	UpdateAutoNotice: "\n📦 发现新版本：%s → %s，正在自动更新...\n",
+	UpdateChecking:   "当前版本: %s，正在检查更新...\n",
+	UpdateFailed:     "更新失败:",
+	UpdateUpToDate:   "已是最新版本 (%s)。\n",
+	UpdateDone:       "✓ 已更新到 %s。\n",
 
 	ErrNoDomains:    "错误: 没有有效的测试域名。",
 	ErrNoServers:    "错误: 没有有效的测试服务器。",
