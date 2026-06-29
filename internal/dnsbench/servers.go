@@ -49,11 +49,11 @@ var DefaultServers = []Server{
 	// {Name: "Bytedance 2 (UDP)", Address: "180.184.2.2", Protocol: UDP},
 	// {Name: "OneDNS 1 (UDP)", Address: "117.50.10.10", Protocol: UDP},
 	// {Name: "OneDNS 2 (UDP)", Address: "52.80.52.52", Protocol: UDP},
-	// {Name: "Google 1 (UDP)", Address: "8.8.8.8", Protocol: UDP},
+	{Name: "Google 1 (UDP)", Address: "8.8.8.8", Protocol: UDP},
 	// {Name: "Google 2 (UDP)", Address: "8.8.4.4", Protocol: UDP},
-	// {Name: "Cloudflare 1 (UDP)", Address: "1.1.1.1", Protocol: UDP},
+	{Name: "Cloudflare 1 (UDP)", Address: "1.1.1.1", Protocol: UDP},
 	// {Name: "Cloudflare 2 (UDP)", Address: "1.0.0.1", Protocol: UDP},
-	// {Name: "OpenDNS 1 (UDP)", Address: "208.67.222.222", Protocol: UDP},
+	{Name: "OpenDNS 1 (UDP)", Address: "208.67.222.222", Protocol: UDP},
 	// {Name: "OpenDNS 2 (UDP)", Address: "208.67.220.220", Protocol: UDP},
 	// {Name: "Quad9 (UDP)", Address: "9.9.9.9", Protocol: UDP},
 
@@ -64,13 +64,17 @@ var DefaultServers = []Server{
 	// {Name: "Quad9 (DoT)", Address: "dns.quad9.net", Protocol: DOT},
 
 	// All DoH servers use the RFC 8484 standard /dns-query endpoint (wire-format, application/dns-message).
-	{Name: "AliDNS (DoH)", Address: "https://dns.alidns.com/dns-query", Protocol: DOH},
+	// {Name: "AliDNS (DoH)", Address: "https://dns.alidns.com/dns-query", Protocol: DOH},
 	// {Name: "DNSPod (DoH)", Address: "https://doh.pub/dns-query", Protocol: DOH},
 	// {Name: "Cloudflare (DoH)", Address: "https://cloudflare-dns.com/dns-query", Protocol: DOH},
 	// {Name: "Google (DoH)", Address: "https://dns.google/dns-query", Protocol: DOH},
 	// {Name: "Quad9 (DoH)", Address: "https://dns.quad9.net/dns-query", Protocol: DOH},
 
 	{Name: "Tokyo Japan", Address: "210.224.86.126", Protocol: UDP},
+	{Name: "Hong Kong 1", Address: "203.80.96.10", Protocol: UDP},
+	{Name: "Hong Kong 2", Address: "203.80.96.9", Protocol: UDP},
+	{Name: "Hong Kong 3", Address: "202.67.240.222", Protocol: UDP},
+	{Name: "Hong Kong 4", Address: "202.67.240.221", Protocol: UDP},
 }
 
 // DefaultDomains is the built-in list of test domains (a balanced selection per category, deduplicated across same-company domains).

@@ -54,6 +54,7 @@ type Messages struct {
 	SystemSuffix  string   // appended to the system DNS row, e.g. " (current)"
 	RecommendLine string   // "    Score: %.2f, avg latency: %s, success rate: %.1f%%\n"
 	NoGoodDNS     string
+	AllFailed     string // shown when all queries to a server failed, e.g. "timeout"
 
 	// system DNS verdict.
 	VerdictAllFailed  string // (sysAddr, bestName, bestAddr)
@@ -113,6 +114,7 @@ var en = &Messages{
 	SystemSuffix:  " (current)",
 	RecommendLine: "    Score: %.2f, avg latency: %s, success rate: %.1f%%\n",
 	NoGoodDNS:     "No sufficiently reliable DNS server found; please check your network connection.",
+	AllFailed:     "timeout",
 
 	VerdictAllFailed:  "⚠️  Current default DNS (%s) failed every query; consider switching to #1 %s (%s).",
 	VerdictBest:       "✅ Current default DNS (%s) is already the best; no change needed.",
@@ -168,6 +170,7 @@ var zh = &Messages{
 	SystemSuffix:  " (当前)",
 	RecommendLine: "    综合评分: %.2f, 平均延迟: %s, 成功率: %.1f%%\n",
 	NoGoodDNS:     "没有找到表现足够好的 DNS 服务器，请检查网络连接。",
+	AllFailed:     "超时",
 
 	VerdictAllFailed:  "⚠️  当前默认 DNS (%s) 查询全部失败，建议切换到 #1 %s (%s)。",
 	VerdictBest:       "✅ 当前默认 DNS (%s) 已是最优，无需调整。",

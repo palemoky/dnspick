@@ -50,13 +50,21 @@ func PrintResultsTable(results []dnsbench.Result) {
 		if r.IsSystem {
 			name += i18n.L().SystemSuffix
 		}
+
+		avgTimeStr := r.AvgTime.Round(time.Microsecond).String()
+		scoreStr := fmt.Sprintf("%.2f", r.Score)
+		if r.Successes == 0 {
+			avgTimeStr = red(i18n.L().AllFailed)
+			scoreStr = red("-")
+		}
+
 		table.Append([]string{
 			fmt.Sprintf("%d", i+1),
 			name,
 			displayAddress(r),
-			r.AvgTime.Round(time.Microsecond).String(),
+			avgTimeStr,
 			rateStr,
-			fmt.Sprintf("%.2f", r.Score),
+			scoreStr,
 		})
 	}
 	table.Render()
@@ -417,6 +425,17 @@ func PrintResolutions(results []dnsbench.Result, ports []int) {
 	// Output rows grouped by server and domain.
 	firstServer := true
 	for _, serverName := range serverOrder {
+		data := serverDataMap[serverName]
+		domains := data.Domains
+
+		// Use the original domainOrder to maintain consistency.
+		var finalDomains []string
+		for _, d := range domainOrder {
+			if _, ok := domains[d]; ok {
+				finalDomains = append(finalDomains, d)
+			}
+		}
+
 		// Print a visible line before each server (except the first).
 		if !firstServer {
 			sep := make([]string, len(colWidths)-colStart)
@@ -426,20 +445,18 @@ func PrintResolutions(results []dnsbench.Result, ports []int) {
 			mergedTable.Append(sep)
 		}
 		firstServer = false
-		data := serverDataMap[serverName]
-		domains := data.Domains
 
-		// Sort domains to maintain consistent order
-		var sortedDomains []string
-		for d := range domains {
-			sortedDomains = append(sortedDomains, d)
-		}
-		// Use the original domainOrder to maintain consistency
-		var finalDomains []string
-		for _, d := range domainOrder {
-			if _, ok := domains[d]; ok {
-				finalDomains = append(finalDomains, d)
-			}
+		// Servers with no successful resolutions: show a single error row.
+		if len(finalDomains) == 0 {
+			mergedTable.Append([]string{
+				serverName,
+				data.Address,
+				"-",
+				red(m.AllFailed),
+				"-",
+				"-",
+			}[colStart:])
+			continue
 		}
 
 		firstRowForServer := true
